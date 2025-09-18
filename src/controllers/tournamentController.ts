@@ -99,6 +99,11 @@ export async function createTeams(req: Request, res: Response) {
     if (!tournamentId || !Array.isArray(teams) || teams.length === 0) {
       return res.status(400).json({ msg: "tournamentId and teams required" });
     }
+    // Check if tournament exists
+    const tournament = await Tournament.findById(tournamentId);
+    if (!tournament) {
+      return res.status(404).json({ msg: "Tournament not found" });
+    }
     const docs = teams.map((t) => ({
       tournamentId: new Types.ObjectId(tournamentId),
       seedNumber: t.seedNumber,

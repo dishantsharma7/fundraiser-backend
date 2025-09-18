@@ -6,8 +6,8 @@ dotenv.config();
 import authPlayerRoutes from "./routes/authPlayer";
 import authAdminRoutes from "./routes/authAdmin";
 import tournamentsRoutes from "./routes/tournaments";
-// import ticketsRoutes from "./routes/tickets";
-// import scoresRoutes from "./routes/scores";
+import ticketsRoutes from "./routes/tickets";
+import scoresRoutes from "./routes/scores";
 // import prizesRoutes from "./routes/prizes";
 
 const app = express();
@@ -18,8 +18,8 @@ app.use(express.json());
 app.use("/api/auth/player", authPlayerRoutes);
 app.use("/api/auth/admin", authAdminRoutes);
 app.use("/api/tournaments", tournamentsRoutes);
-// app.use("/api/tickets", ticketsRoutes);
-// app.use("/api/scores", scoresRoutes);
+app.use("/api/tickets", ticketsRoutes);
+app.use("/api/scores", scoresRoutes);
 // app.use("/api/prizes", prizesRoutes);
 
 export default app;
