@@ -106,12 +106,14 @@ export async function getTicket(req: Request, res: Response) {
  */
 export async function listTickets(req: Request, res: Response) {
   try {
-    const { tournamentId, status } = req.query;
+    const { tournamentId } = req.query;
     if (!tournamentId)
       return res.status(400).json({ msg: "tournamentId required" });
-    const q: any = { tournamentId };
-    if (status) q.status = status;
-    const tickets = await Ticket.find(q).populate("teams").limit(1000);
+    // const q: any = { tournamentId };
+    // if (status) q.status = status;
+    const tickets = await Ticket.find({ tournamentId })
+      .populate("teams")
+      .limit(1000);
     return res.json(tickets);
   } catch (err) {
     console.error(err);
