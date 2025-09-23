@@ -12,7 +12,12 @@ import scoresRoutes from "./routes/scores";
 import dashboardRoutes from "./routes/dashboard";
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true, // important!
+  })
+);
 app.use(express.json());
 
 // routes
