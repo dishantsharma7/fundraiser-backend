@@ -66,6 +66,7 @@ export async function login(req: Request, res: Response) {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "none",
+    domain: "localhost",
     maxAge: 2 * 60 * 60 * 1000, // 2 hours
   });
   return res.json({
