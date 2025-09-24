@@ -65,10 +65,10 @@ export async function loginAdmin(req: Request, res: Response) {
   // Set token in HTTP-only cookie
   res.cookie("admin_token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "none",
-    domain: "localhost",
+    // secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
     maxAge: 2 * 60 * 60 * 1000, // 2 hours
+    path: "/",
   });
   return res.json({
     success: true,
