@@ -64,7 +64,7 @@ export async function login(req: Request, res: Response) {
   // Set token in HTTP-only cookie
   res.cookie("player_token", token, {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "none",
     maxAge: 2 * 60 * 60 * 1000, // 2 hours
   });
