@@ -14,7 +14,7 @@ import dashboardRoutes from "./routes/dashboard";
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://fund-raiser-omega.vercel.app"],
     credentials: true, // important!
   })
 );
