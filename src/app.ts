@@ -1,5 +1,5 @@
 import express from "express";
-import cors from "cors";
+import cors, { CorsOptions } from "cors";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -12,12 +12,32 @@ import scoresRoutes from "./routes/scores";
 import dashboardRoutes from "./routes/dashboard";
 
 const app = express();
-app.use(
-  cors({
-    origin: ["http://localhost:5173", "https://fund-raiser-omega.vercel.app"],
-    credentials: true, // important!
-  })
-);
+
+const allowedOrigins = [
+  "http://localhost:5173", // dev
+  "https://fund-raiser-jw2v.vercel.app", // production
+];
+// app.use(
+//   cors({
+//     origin: ["http://localhost:5173", "https://fund-raiser-omega.vercel.app"],
+//     credentials: true, // important!
+//   })
+// );
+
+const corsOptions: CorsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like curl or mobile apps)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true, // Allow cookies
+};
+
+// ✅ Apply CORS globally before routes
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // routes
