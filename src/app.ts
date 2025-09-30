@@ -17,7 +17,7 @@ const app = express();
 app.use(cookieParser());
 const allowedOrigins = [
   "http://localhost:5173", // dev
-  "https://fund-raiser-jw2v.vercel.app", // production
+  "https://fund-raiser-omega.vercel.app", // production
 ];
 // app.use(
 //   cors({
