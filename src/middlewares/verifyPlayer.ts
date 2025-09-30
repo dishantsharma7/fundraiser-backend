@@ -12,10 +12,9 @@ export default async function verifyPlayer(
   res: Response,
   next: NextFunction
 ) {
-  const auth = req.headers.authorization;
-  if (!auth?.startsWith("Bearer "))
-    return res.status(401).json({ msg: "Missing token" });
-  const token = auth.split(" ")[1];
+  const token = req.cookies?.player_token;
+  if (!token)
+    return res.status(401).json({ msg: "Missing player token in cookies" });
   try {
     const payload: any = jwt.verify(token, JWT_SECRET);
     if (!payload || payload.type !== "player")

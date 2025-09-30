@@ -1,6 +1,8 @@
 import express from "express";
 import cors, { CorsOptions } from "cors";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+
 dotenv.config();
 
 import authPlayerRoutes from "./routes/authPlayer";
@@ -12,7 +14,7 @@ import scoresRoutes from "./routes/scores";
 import dashboardRoutes from "./routes/dashboard";
 
 const app = express();
-
+app.use(cookieParser());
 const allowedOrigins = [
   "http://localhost:5173", // dev
   "https://fund-raiser-jw2v.vercel.app", // production
@@ -36,7 +38,6 @@ const corsOptions: CorsOptions = {
   credentials: true, // Allow cookies
 };
 
-// ✅ Apply CORS globally before routes
 app.use(cors(corsOptions));
 app.use(express.json());
 

@@ -12,10 +12,10 @@ export default async function verifyAdmin(
   res: Response,
   next: NextFunction
 ) {
-  const auth = req.headers.authorization;
-  if (!auth?.startsWith("Bearer "))
-    return res.status(401).json({ msg: "Missing token" });
-  const token = auth.split(" ")[1];
+  // Get token from cookie
+  const token = req.cookies?.admin_token;
+  if (!token)
+    return res.status(401).json({ msg: "Missing admin token in cookies" });
   try {
     const payload: any = jwt.verify(token, JWT_SECRET);
     if (!payload || payload.type !== "admin")
