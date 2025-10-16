@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import Score from "../models/Score";
 import { recomputeTicketTotals } from "../utils/leaderboard";
+import mongoose from "mongoose";
+import Leaderboard from "../models/Leaderboard";
 
 /**
  * Admin-only: upsert score for a team in a round
@@ -30,8 +32,28 @@ export async function upsertScore(req: Request, res: Response) {
     }
     await score.save();
 
-    // recompute ticket totals (simple approach)
     await recomputeTicketTotals(tournamentId);
+    const totals = await Score.aggregate([
+      { $match: { tournamentId: new mongoose.Types.ObjectId(tournamentId) } },
+      { $group: { _id: "$teamId", totalPoints: { $sum: "$points" } } },
+      { $sort: { totalPoints: -1 } },
+    ]);
+
+    await Leaderboard.deleteMany({ tournamentId });
+    const bulkOps = totals.map((s, i) => ({
+      updateOne: {
+        filter: { tournamentId, teamId: s._id },
+        update: {
+          tournamentId,
+          teamId: s._id,
+          totalPoints: s.totalPoints,
+          rank: i + 1,
+          updatedAt: new Date(),
+        },
+        upsert: true,
+      },
+    }));
+    if (bulkOps.length > 0) await Leaderboard.bulkWrite(bulkOps);
 
     return res.json({ msg: "Score saved", score });
   } catch (err) {

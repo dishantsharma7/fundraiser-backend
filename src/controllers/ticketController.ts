@@ -9,7 +9,7 @@ import {
   generateUniqueTeamCombos,
 } from "../utils/ticketGenerator";
 import { Types } from "mongoose";
-// import { sendEmail } from "../utils/emailSes"; // adjust export name if needed
+import { sendEmail } from "../utils/email";
 
 /**
  * NOTE: In production you MUST trigger ticket creation after successful payment webhook.
@@ -47,30 +47,50 @@ export async function createTicketForPlayerEndpoint(
       return res.status(400).json({ msg: "Not enough teams configured" });
     }
 
-    const combos = generateUniqueTeamCombos(ids, teamsPerTicket, 1);
-    const combo = combos[0].map((x) => new Types.ObjectId(x));
+    // Generate all possible combos and shuffle
+    const allCombos = generateUniqueTeamCombos(ids, teamsPerTicket);
+    let uniqueCombo = null;
+    for (const comboArr of allCombos) {
+      // Check if a ticket with this combo already exists
+      const exists = await Ticket.findOne({
+        tournamentId,
+        teams: {
+          $size: teamsPerTicket,
+          $all: comboArr.map((x) => new Types.ObjectId(x)),
+        },
+      });
+      if (!exists) {
+        uniqueCombo = comboArr.map((x) => new Types.ObjectId(x));
+        break;
+      }
+    }
+    if (!uniqueCombo) {
+      return res.status(400).json({
+        msg: "All possible team combinations have already been assigned to tickets.",
+      });
+    }
 
     const ticket = new Ticket({
       playerId: new Types.ObjectId(playerId),
       tournamentId: new Types.ObjectId(tournamentId),
       ticketNumber: generateTicketNumber(),
       accessCode: generateAccessCode(),
-      teams: combo,
+      teams: uniqueCombo,
       status: "paid",
     });
     await ticket.save();
 
     // send ticket email (best-effort)
-    // try {
-    //   const player = await Player.findById(playerId);
-    //   if (player?.email) {
-    //     const html = `<p>Your ticket: ${ticket.ticketNumber}</p><p>Access code: ${ticket.accessCode}</p>`;
-    //     console.log("Email sent to:", player.email);
-    //     // await sendEmail(player.email, "Your Ticket", html);     //send email fn here!
-    //   }
-    // } catch (emailErr) {
-    //   console.warn("Failed to send email:", emailErr);
-    // }
+    try {
+      const player = await Player.findById(playerId);
+      if (player?.email) {
+        const html = `<p>Your ticket: ${ticket.ticketNumber}</p><p>Access code: ${ticket.accessCode}</p> <p>Teams Alloted: ${ticket.teams}</p>`;
+        console.log("Email sent to:", player.email);
+        await sendEmail(player.email, "Your Ticket", html); //send email fn here!
+      }
+    } catch (emailErr) {
+      console.warn("Failed to send email:", emailErr);
+    }
 
     return res.status(201).json(ticket);
   } catch (err) {

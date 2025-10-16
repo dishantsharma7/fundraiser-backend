@@ -12,6 +12,7 @@ import ticketsRoutes from "./routes/tickets";
 import scoresRoutes from "./routes/scores";
 // import prizesRoutes from "./routes/prizes";
 import dashboardRoutes from "./routes/dashboard";
+import leaderboardRoutes from "./routes/leaderboard";
 
 const app = express();
 app.use(cookieParser());
@@ -49,5 +50,6 @@ app.use("/api/tickets", ticketsRoutes);
 app.use("/api/scores", scoresRoutes);
 // app.use("/api/prizes", prizesRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/leaderboard", leaderboardRoutes);
 
 export default app;
