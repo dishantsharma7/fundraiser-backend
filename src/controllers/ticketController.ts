@@ -106,11 +106,19 @@ export async function createTicketForPlayerEndpoint(
 export async function getTicket(req: Request, res: Response) {
   try {
     const { id } = req.params;
+    // validate id to avoid Mongoose CastError when an invalid string is passed
+    if (!Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ msg: "Invalid ticket id" });
+    }
     const ticket = await Ticket.findById(id).populate("teams");
     if (!ticket) return res.status(404).json({ msg: "Ticket not found" });
     // ensure player owns the ticket (if player route)
     const player = (req as any).player;
-    if (player && ticket.playerId.toString() !== player._id.toString()) {
+    if (
+      player &&
+      ticket.playerId &&
+      ticket.playerId.toString() !== player._id.toString()
+    ) {
       return res.status(403).json({ msg: "Forbidden" });
     }
     return res.json(ticket);
@@ -134,6 +142,47 @@ export async function listTickets(req: Request, res: Response) {
     const tickets = await Ticket.find({ tournamentId })
       .populate("teams")
       .limit(1000);
+    return res.json(tickets);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+}
+
+/**
+ * Player-only: list all tickets for the authenticated player (playerId must match logged-in player)
+ * GET /api/tickets/player/:playerId
+ */
+export async function getTicketsByPlayer(req: Request, res: Response) {
+  try {
+    const { playerId } = req.params;
+    if (!Types.ObjectId.isValid(playerId))
+      return res.status(400).json({ msg: "Invalid player id" });
+    const player = (req as any).player;
+    if (!player || player._id.toString() !== playerId)
+      return res.status(403).json({ msg: "Forbidden" });
+    const tickets = await Ticket.find({ playerId })
+      .populate("teams")
+      .sort({ createdAt: -1 });
+    return res.json(tickets);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+}
+
+/**
+ * Admin-only: list all tickets for any player
+ * GET /api/tickets/admin/player/:playerId
+ */
+export async function getTicketsByPlayerAdmin(req: Request, res: Response) {
+  try {
+    const { playerId } = req.params;
+    if (!Types.ObjectId.isValid(playerId))
+      return res.status(400).json({ msg: "Invalid player id" });
+    const tickets = await Ticket.find({ playerId })
+      .populate("teams")
+      .sort({ createdAt: -1 });
     return res.json(tickets);
   } catch (err) {
     console.error(err);
