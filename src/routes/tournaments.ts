@@ -9,6 +9,8 @@ import {
   createTeams,
   updateTeam,
   listTeams,
+  listTeamSummaries,
+  listTournamentSummaries,
 } from "../controllers/tournamentController";
 import verifyAdmin from "../middlewares/verifyAdmin";
 
@@ -16,8 +18,10 @@ const router = Router();
 
 // Public
 router.get("/", listTournaments);
+router.get("/summary", listTournamentSummaries);
 router.get("/:id", getTournament);
 router.get("/teams/list", listTeams); // ?tournamentId=...
+router.get("/teams/summary", listTeamSummaries); // ?tournamentId=...
 
 // Admin-only
 router.post(

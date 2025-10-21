@@ -71,6 +71,27 @@ export async function listTournaments(req: Request, res: Response) {
 }
 
 /**
+ * List tournament summaries (id, name, createdAt)
+ * GET /api/tournaments/summary
+ */
+export async function listTournamentSummaries(req: Request, res: Response) {
+  try {
+    const tournaments = await Tournament.find()
+      .select("name createdAt")
+      .sort({ createdAt: -1 });
+    const result = tournaments.map((t) => ({
+      id: t._id,
+      name: t.name,
+      createdAt: t.createdAt,
+    }));
+    return res.json(result);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+}
+
+/**
  * Delete tournament (admin-only)
  */
 export async function deleteTournament(req: Request, res: Response) {
@@ -145,6 +166,29 @@ export async function listTeams(req: Request, res: Response) {
       return res.status(400).json({ msg: "tournamentId query required" });
     const teams = await Team.find({ tournamentId }).sort({ seedNumber: 1 });
     return res.json(teams);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+}
+
+/**
+ * List team summaries (id, teamName, createdAt) for a tournament
+ * GET /api/tournaments/teams/summary?tournamentId=...
+ */
+export async function listTeamSummaries(req: Request, res: Response) {
+  try {
+    // return all teams across tournaments
+    const teams = await Team.find()
+      .select("teamName createdAt")
+      .sort({ seedNumber: 1 });
+    // map to exact shape: id, teamName, createdAt
+    const result = teams.map((t) => ({
+      id: t._id,
+      teamName: t.teamName,
+      createdAt: t.createdAt,
+    }));
+    return res.json(result);
   } catch (err) {
     console.error(err);
     return res.status(500).json({ msg: "Server error" });
