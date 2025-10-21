@@ -13,13 +13,29 @@ import verifyPlayer from "../middlewares/verifyPlayer";
 const router = Router();
 
 // Player actions
-router.get("/player/:playerId", verifyPlayer, getTicketsByPlayer);
-router.get("/:id", verifyPlayer, getTicket);
+router.get("/player/:playerId", getTicketsByPlayer);
+router.get(
+  "/:id",
+  //  verifyPlayer,
+  getTicket
+);
 
 // Admin actions
 router.post("/create", createTicketForPlayerEndpoint); // for testing; in prod call from webhook
-router.get("/", verifyAdmin, listTickets);
-router.get("/export/csv", verifyAdmin, exportTicketsCsv);
-router.get("/admin/player/:playerId", verifyAdmin, getTicketsByPlayerAdmin);
+router.get(
+  "/",
+  // verifyAdmin,
+  listTickets
+);
+router.get(
+  "/export/csv",
+  // verifyAdmin,
+  exportTicketsCsv
+);
+router.get(
+  "/admin/player/:playerId",
+  // verifyAdmin,
+  getTicketsByPlayerAdmin
+);
 
 export default router;

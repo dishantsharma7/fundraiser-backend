@@ -158,9 +158,9 @@ export async function getTicketsByPlayer(req: Request, res: Response) {
     const { playerId } = req.params;
     if (!Types.ObjectId.isValid(playerId))
       return res.status(400).json({ msg: "Invalid player id" });
-    const player = (req as any).player;
-    if (!player || player._id.toString() !== playerId)
-      return res.status(403).json({ msg: "Forbidden" });
+    // const player = (req as any).player;
+    // if (!player || player._id.toString() !== playerId)
+    //   return res.status(403).json({ msg: "Forbidden" });
     const tickets = await Ticket.find({ playerId })
       .populate("teams")
       .sort({ createdAt: -1 });

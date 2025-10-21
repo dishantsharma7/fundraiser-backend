@@ -20,12 +20,32 @@ router.get("/:id", getTournament);
 router.get("/teams/list", listTeams); // ?tournamentId=...
 
 // Admin-only
-router.post("/", verifyAdmin, createTournament);
-router.put("/:id", verifyAdmin, updateTournament);
-router.delete("/:id", verifyAdmin, deleteTournament);
+router.post(
+  "/",
+  //  verifyAdmin,
+  createTournament
+);
+router.put(
+  "/:id",
+  //  verifyAdmin,
+  updateTournament
+);
+router.delete(
+  "/:id",
+  // verifyAdmin,
+  deleteTournament
+);
 
 // Teams
-router.post("/teams", verifyAdmin, createTeams);
-router.put("/teams/:id", verifyAdmin, updateTeam);
+router.post(
+  "/teams",
+  //  verifyAdmin,
+  createTeams
+);
+router.put(
+  "/teams/:id",
+  // verifyAdmin,
+  updateTeam
+);
 
 export default router;
